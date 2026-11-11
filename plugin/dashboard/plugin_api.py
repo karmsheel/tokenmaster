@@ -8,9 +8,10 @@ Two jobs, both read-mostly:
   fraction of the truth (a coding profile can hold more spend than the default
   one). Rows carry ``first_seen``/``last_seen``, every token class, and the
   billing route, so the series is derivable without touching a transcript.
-* **Accounts** — the credential pool (``auth.json`` -> ``credential_pool``) plus
-  whatever live allowance windows Hermes can fetch for a provider
-  (``agent.account_usage``) and the user's own subscription/API-spend mode.
+* **Accounts** — the credential pool, read through Hermes' own
+  ``read_credential_pool`` (labels, ids and status only), plus whatever live
+  allowance windows Hermes can fetch for a provider (``agent.account_usage``)
+  and the user's own subscription/API-spend mode.
 
 Every handler is ``async def`` and offloads blocking work (SQLite, network
 allowance fetches) with ``asyncio.to_thread``: under the default
@@ -899,24 +900,22 @@ def _quota_trends(tokens_per_day: dict[str, float]) -> dict[str, list[dict[str, 
 
 
 def _read_pool() -> dict[str, Any]:
-    """Credential-pool metadata from ``auth.json``: labels, ids and status only.
+    """Credential-pool metadata through Hermes: labels, ids and status only.
 
-    The file is read as data — no token is imported, refreshed or written, so
-    the single-use refresh chains Hermes owns are never touched. A retry covers
-    the window where a rotation rewrites the file mid-read.
+    ``read_credential_pool`` is Hermes' own reader of the pool, so this plugin
+    reads the store the way the app does (the active profile's rows, with the
+    global root as the per-provider fallback) instead of opening ``auth.json``
+    itself. Rows are read as data — no token is imported, refreshed or written,
+    so the single-use refresh chains Hermes owns are never touched.
     """
-    path = _root_home() / "auth.json"
-    for attempt in range(2):
-        try:
-            raw = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            raw = None
-        pool = raw.get("credential_pool") if isinstance(raw, dict) else None
-        if isinstance(pool, dict) and pool:
-            return pool
-        if attempt == 0:
-            time.sleep(0.05)
-    return {}
+    try:
+        from hermes_cli.auth import read_credential_pool
+
+        pool = read_credential_pool(None)
+    except Exception:  # noqa: BLE001 - the accounts card must never fail the page
+        logger.debug("token-master: credential pool unavailable", exc_info=True)
+        return {}
+    return pool if isinstance(pool, dict) else {}
 
 
 def _pool_accounts() -> list[dict[str, Any]]:
