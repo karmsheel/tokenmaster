@@ -1,6 +1,8 @@
 # Token Master
 
-Token spend analytics for [Hermes](https://hermes.nousresearch.com) — one graph of daily
+![Token Master: a Roman centurion in a winged helmet beside the TOKEN MASTER wordmark, over a circuit-board diagram](docs/banner.jpg)
+
+Token spend analytics for [Hermes](https://hermes-agent.nousresearch.com) — one graph of daily
 token consumption across **every Hermes profile**, provider and account on the machine,
 plus the screen that marks each credential as **subscription (quota)**, **API spend ($)**
 or **free tier**.
@@ -59,6 +61,34 @@ Copies the two halves into `%LOCALAPPDATA%\hermes` and enables the plugin:
 Then open Hermes Desktop: **Token Master** appears as a sidebar row, and the page mounts at
 `/token-master`. If the row is missing, run ⌘K → *Reload desktop plugins*.
 
+## Disclosure — what it reads, writes and calls
+
+Nothing here is hidden behind a setting; this is the whole list.
+
+- **Reads outside its own data.** Every Hermes profile's `state.db`, opened **read-only**
+  (`file:...?mode=ro`), to aggregate `session_model_usage`. DeepSeek Harness session files
+  under `~/.dsh/storages/*/sessions/*.json`. The credential pool through Hermes' own
+  `read_credential_pool` — labels, ids, auth type and last status only; no token is read into
+  a response. Its own state under `plugin-data/token-master/`.
+- **Writes.** Only `plugin-data/token-master/`: `settings.json`, `quota-samples.json`
+  (timestamps and percentages), and `remote/<host>.json`. Never `state.db`, never an install
+  directory, never a credential store.
+- **Network.** None of its own. `Refresh limits` (and the background fill of an expired
+  cache) calls Hermes' `fetch_account_usage(provider, read_only=True)`, which reads the
+  provider's usage endpoint — `api.anthropic.com`, `chatgpt.com/backend-api`, OpenCode Go,
+  OpenRouter — and cannot refresh, rotate or write a sign-in. No telemetry, no analytics, no
+  phone-home.
+- **Shell commands.** One, from one button. **Sync now** on a machine you added runs
+  `ssh -o BatchMode=yes -o ConnectTimeout=10 <host> python3 - <days>` and streams
+  `collector/scan_rows.py` into the far side's interpreter. Nothing is installed or written
+  on that machine, and its `state.db` is opened read-only there. Hosts come from you; a host
+  that fails the non-interactive SSH probe is reported, not retried in a loop.
+- **Background work.** None: no timers, no cron job, no watchers, no daemon of its own. Quota
+  sampling only appends while the page (or a refresh) is open, which is why the trend means
+  "what happened while I was watching".
+- **Credentials.** None read from files or environment, none stored, none refreshed. Any
+  `requires_env` would be read with `agent.secret_scope.get_secret`; the plugin declares none.
+
 ## Guide compliance
 
 Built against the [Build a Hermes Plugin](https://hermes-agent.nousresearch.com/docs/developer-guide/plugins)
@@ -69,8 +99,14 @@ hermes plugins doctor   ~/.hermes/plugins/token-master --ci   # discovery, manif
 hermes plugins validate ~/.hermes/plugins/token-master        # catalog admission checks
 ```
 
-`validate` passes with no warnings: no private core imports, no core overrides, declared
-tools/hooks match registrations. Two guide rules shape the backend:
+`validate` passes with one warning, and it is a deliberate trade-off. The warning is catalog
+rule 9 on a single import — `hermes_cli.auth.read_credential_pool`, the reader behind the
+Accounts card. The alternative is parsing `auth.json` directly, which catalog rule 11 forbids
+outright, so the plugin reads the pool the way Hermes does and takes the documented seam.
+Everything else is clean: no core overrides, no other private core imports, and the declared
+tools/hooks match registrations.
+
+Two guide rules shape the backend:
 
 - **Usage panels never touch credentials**: quota reads go through
   `fetch_account_usage(provider, read_only=True)`, which cannot refresh, rotate or rewrite a
