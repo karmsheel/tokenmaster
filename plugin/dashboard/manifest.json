@@ -1,0 +1,8 @@
+{
+  "name": "token-master",
+  "label": "Token Master",
+  "description": "Token spend analytics across every subscription, account and provider Hermes can see.",
+  "icon": "BarChart3",
+  "version": "0.1.0",
+  "api": "plugin_api.py"
+}

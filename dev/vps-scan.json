@@ -1,0 +1,120 @@
+{
+ "host": "srv903250",
+ "days": 3,
+ "hermes": {
+  "default": {
+   "tokens": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "total": 0
+   },
+   "providers": {},
+   "calls": 0
+  },
+  "brook": {
+   "tokens": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "total": 0
+   },
+   "providers": {},
+   "calls": 0
+  },
+  "coder": {
+   "tokens": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "total": 0
+   },
+   "providers": {},
+   "calls": 0
+  },
+  "lifequest": {
+   "tokens": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "total": 0
+   },
+   "providers": {},
+   "calls": 0
+  },
+  "nami": {
+   "tokens": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "total": 0
+   },
+   "providers": {},
+   "calls": 0
+  },
+  "reviewer": {
+   "tokens": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "total": 0
+   },
+   "providers": {},
+   "calls": 0
+  },
+  "sanji": {
+   "tokens": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "total": 0
+   },
+   "providers": {},
+   "calls": 0
+  },
+  "zoro": {
+   "tokens": {
+    "input_tokens": 480480,
+    "output_tokens": 119715,
+    "cache_read_tokens": 18714752,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 62833,
+    "total": 19377780
+   },
+   "providers": {
+    "opencode-go": 19377780
+   },
+   "calls": 231
+  }
+ },
+ "dsh": {
+  "openai": {
+   "tokens": 379906222,
+   "sessions": 28
+  },
+  "opencode-go": {
+   "tokens": 823305133,
+   "sessions": 18
+  }
+ },
+ "totals": {
+  "hermes": 19377780,
+  "dsh": 1203211355,
+  "all": 1222589135
+ }
+}
+

@@ -1,0 +1,18 @@
+name: token-master
+version: "0.1.0"
+manifest_version: 2
+api_version: 1
+description: >-
+  Token spend analytics for Hermes — one daily graph of token consumption across every
+  provider and account Hermes can see, a per-model and per-provider breakdown, and a
+  configuration screen that marks each credential as subscription-backed (quota),
+  pay-per-token API spend, or free tier. Reads the token accounting Hermes already
+  records; no extra telemetry, no network calls except an explicit limits refresh.
+author: karms
+license: MIT
+tags: [analytics, tokens, cost, subscriptions, desktop, dashboard]
+requires_hermes: ">=0.23.0"
+provides_tools: []
+provides_hooks: []
+capabilities: []
+requires_env: []
