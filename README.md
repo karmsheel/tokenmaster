@@ -78,11 +78,14 @@ Nothing here is hidden behind a setting; this is the whole list.
   provider's usage endpoint — `api.anthropic.com`, `chatgpt.com/backend-api`, OpenCode Go,
   OpenRouter — and cannot refresh, rotate or write a sign-in. No telemetry, no analytics, no
   phone-home.
-- **Shell commands.** One, from one button. **Sync now** on a machine you added runs
-  `ssh -o BatchMode=yes -o ConnectTimeout=10 <host> python3 - <days>` and streams
-  `collector/scan_rows.py` into the far side's interpreter. Nothing is installed or written
-  on that machine, and its `state.db` is opened read-only there. Hosts come from you; a host
-  that fails the non-interactive SSH probe is reported, not retried in a loop.
+- **Shell commands.** Two, both read-only, both behind an explicit action. **Sync now** on a
+  machine you added runs `ssh -o BatchMode=yes -o ConnectTimeout=10 <host> python3 - <days>` and
+  streams `collector/scan_rows.py` into the far side's interpreter: nothing is installed or
+  written on that machine, and its `state.db` is opened read-only there. Opening the **Remote
+  machines** card runs `tailscale status --json` (when Tailscale is installed) to offer online
+  peers so a host can be added without typing it; discovery never writes the host list — adding
+  one is still a click. Hosts that fail the non-interactive SSH probe are reported, not retried
+  in a loop.
 - **Background work.** None: no timers, no cron job, no watchers, no daemon of its own. Quota
   sampling only appends while the page (or a refresh) is open, which is why the trend means
   "what happened while I was watching".
