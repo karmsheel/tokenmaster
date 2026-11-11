@@ -15,10 +15,10 @@ spec.loader.exec_module(mod)
 print("collector present:", mod._collector_path().is_file(), mod._collector_path())
 
 # Configure the machine, exactly as the page's settings call would.
-mod._write_settings({"accounts": mod._read_settings().get("accounts") or {}, "remote_hosts": ["buzz-vps"]})
+mod._write_settings({"accounts": mod._read_settings().get("accounts") or {}, "remote_hosts": ["edge-01"]})
 print("settings:", mod._read_settings())
 
-result = mod._collect_host("buzz-vps", 3)
+result = mod._collect_host("edge-01", 3)
 print("collect:", json.dumps(result, indent=1)[:600])
 
 summary = mod._summary(3)

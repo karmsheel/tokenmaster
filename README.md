@@ -189,15 +189,18 @@ Edit the installed copy (`~/.hermes/desktop-plugins/token-master/plugin.js`) —
 app hot-reloads on save. The **backend is different**: the router is imported once and
 hot-mounted on its first request, so editing `plugin_api.py` needs a gateway restart
 (`hermes gateway restart`) before the running app sees the change. To render the UI without a
-browser, `dev/` plus `.smoke/` provide a Node harness that loads the plugin with the real SDK
-surface stubbed and renders it with React's server renderer against real backend JSON:
+browser, `.smoke/` loads `plugin/desktop/plugin.js` directly, stubs the SDK surface, and renders
+it with React's server renderer against committed JSON fixtures:
 
 ```powershell
-python dev/make-fixtures.py          # dump live /summary + /accounts into .smoke/fixtures
-copy plugin/desktop/plugin.js .smoke/token-master.mjs
+python dev/make-fixtures.py          # regenerate .smoke/fixtures (synthetic by default)
 cd .smoke; node run.mjs              # SMOKE OK  (render)
 node data-test.mjs                   # CHART DATA OK  (stacked bars reconcile with totals)
 ```
+
+The fixtures are synthetic — the backend's payload shape with invented accounts, profiles and
+volumes — so they can be committed and shared. `--live` dumps your own database instead (see
+[.smoke/README.md](.smoke/README.md)).
 
 `dev/check-mount.py` proves the backend is discovered, mounts on a fresh FastAPI app, and
 answers 200 for `/summary`, `/accounts` and `/settings`. `dev/check-summary.py` prints the

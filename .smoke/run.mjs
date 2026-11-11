@@ -9,7 +9,7 @@ globalThis.document = {
   createElement: () => ({ textContent: '', remove: () => {} })
 }
 
-const plugin = (await import('./token-master.mjs')).default
+const plugin = (await import('./load-plugin.mjs')).default
 const registrations = []
 const disposers = []
 const ctx = {

@@ -1,9 +1,35 @@
 // Numeric checks on the chart's data layer: the stacked series must reconcile
 // with the backend totals, and opencode-go must be its own series.
 import { readFileSync } from 'node:fs'
-import { buildBuckets, resolveSeries } from './token-master.mjs'
+import { buildBuckets, resolveSeries } from './load-plugin.mjs'
 
-const data = JSON.parse(readFileSync(new URL('./fixtures/summary.json', import.meta.url), 'utf8'))
+const DAY_MS = 86400000
+const pad2 = (value) => String(value).padStart(2, '0')
+const keyOf = (date) => `${date.getUTCFullYear()}-${pad2(date.getUTCMonth() + 1)}-${pad2(date.getUTCDate())}`
+const toUtc = (key) =>
+  Date.UTC(Number(key.slice(0, 4)), Number(key.slice(5, 7)) - 1, Number(key.slice(8, 10)))
+
+// The fixtures are committed, so their day keys are frozen at the moment they
+// were generated while buildBuckets anchors its window to today. Slide the whole
+// payload forward so the 90-day assertions still see the data.
+function anchor(fixture) {
+  const days = (fixture.daily || []).map((row) => row.day).sort()
+  if (days.length === 0) return fixture
+  const now = new Date()
+  const shift = Math.round((toUtc(keyOf(now)) - toUtc(days[days.length - 1])) / DAY_MS)
+  if (shift === 0) return fixture
+  const move = (key) => keyOf(new Date(toUtc(key) + shift * DAY_MS))
+  const shifted = (rows) => (rows || []).map((row) => ({ ...row, day: move(row.day) }))
+  return {
+    ...fixture,
+    daily: shifted(fixture.daily),
+    by_day_provider: shifted(fixture.by_day_provider),
+    by_day_profile: shifted(fixture.by_day_profile),
+    by_day_source: shifted(fixture.by_day_source)
+  }
+}
+
+const data = anchor(JSON.parse(readFileSync(new URL('./fixtures/summary.json', import.meta.url), 'utf8')))
 let failures = 0
 
 function check(label, actual, expected, tolerance = 0) {

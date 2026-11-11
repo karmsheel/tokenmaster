@@ -1271,7 +1271,7 @@ function Page({ ctx }) {
           jsx('input', {
             className: 'tm-input',
             value: draft,
-            placeholder: 'buzz-vps, another-host',
+            placeholder: 'edge-01, edge-02',
             'aria-label': 'Remote machine SSH hosts',
             onChange: (event) => setRemoteDraft(event.target.value)
           }),
